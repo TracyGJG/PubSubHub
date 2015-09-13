@@ -34,7 +34,7 @@
 											P2: S2, S3 & S5
 		*/
 
-		Alert( "<br/><h2>TestOne: Publish then Subscribe - 1 Callback fired.</h2>");
+		Alert( "<h2>TestOne: Publish then Subscribe - 1 Callback fired.</h2>");
 		PubSubHub.publish("TestOne", "TEST ONE");																						// No registered callbacks.
 		PubSubHub.subscribe("Sub1", ["TestOne"], pubSubReport);															// Callback fired.
 
@@ -46,11 +46,9 @@
 		Alert( "<br/><h2>TestOne &amp; Two: Subscribe to two - pre-existing Topics, both callbacks fired.</h2>");
 		PubSubHub.subscribe("Sub4", ["TestTwo","TestOne"], pubSubReport);										// Two callbacks fired for topic 2.
 
-		alert("Second phase");
-		Alert();
-		Alert( "<h1>PubSubHub Tests - Phase 2</h1>");
+		Alert( "<br/><h1>PubSubHub Tests - Phase 2</h1>");
 
-		Alert( "<br/><h2>TestOne - Update1: Topic updated, 2 Callbacks fired.</h2>");
+		Alert( "<h2>TestOne - Update1: Topic updated, 2 Callbacks fired.</h2>");
 		PubSubHub.publish("TestOne", "TEST ONE UPDATE 1");																	// Two callbacks fired for topic 1.
 
 		Alert( "<br/><h2>TestOne - Update2: Topic updated, 1 Callback fired.</h2>");
@@ -58,7 +56,7 @@
 		PubSubHub.publish("TestOne", "TEST ONE UPDATE 2");																	// One callback fired for topic 1.
 
 		Alert( "<br/><h2>TestTwo - Clear: Topic cleared - no callbacks fired.</h2>");
-		PubSubHub.publish("TestTwo");																												// Data cleared - no callbacks fired.
+		PubSubHub.publish("TestTwo");																											// Data cleared - no callbacks fired.
 		PubSubHub.subscribe("Sub5", ["TestTwo"], pubSubReport);															// No callback fired for topic 2.
 
 		Alert( "<br/><h2>TestTwo - Updated: Topic updated, 3 Callbacks fired.</h2>");
