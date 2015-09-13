@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+	<style>
+		table.Y {
+			background-color: yellow;
+		}
+		table.C {
+			background-color: cyan;
+		}
+		table.L {
+			background-color: lime;
+		}
+	</style>
+	<script src='PubSubHub.js'></script>
+</head><body>
+
+	<table class='Y'>
+		<tr>
+			<td colspan='2'><input type='text' id='Yellow' value='Yellow'/></td>
+		</tr>
+		<tr>
+			<td class='C'></td>
+			<td class='L'></td>
+		</tr>
+	</table>
+	<br/><br/>
+
+	<table class='C'>
+		<tr>
+			<td colspan='2'><input type='text' id='Cyan' value='Cyan'/></td>
+		</tr>
+		<tr>
+			<td class='Y'></td>
+			<td class='L'></td>
+		</tr>
+	</table>
+	<br/><br/>
+
+	<table class='L'>
+		<tr>
+			<td colspan='2'><input type='text' id='Lime' value='Lime'/></td>
+		</tr>
+		<tr>
+			<td class='Y'></td>
+			<td class='C'></td>
+		</tr>
+	</table>
+
+<script>
+	"use strict";
+
+	(function() {
+		//	Publishers
+		var arrPubs = document.querySelectorAll("table");
+		var intPubsMax = arrPubs.length;
+		var intPubsIdx = 0;
+		var objInput;
+		var arrSubs, intSubsMax, intSubsIdx;
+
+		for(; intPubsIdx<intPubsMax; intPubsIdx+=1) {
+			objInput = arrPubs[intPubsIdx].querySelector("input");
+			objInput.addEventListener("keyup", function(){
+				PubSubHub.publish(this.id, this.value);
+			});
+		}
+
+		//	Generate the Subscription handler function
+		function genSubscriber( dom) {
+			return function(subId, topic, data) {
+				document.querySelector(dom).innerText = data;
+			};
+		}
+
+		// Derive the Topics Array from the table DOM reference.
+		function deriveTopicArray( dom) {
+			var objInput = document.querySelector("table."+ dom.className+ " input");
+			var arrTopics = [objInput.id];
+			arrTopics.push();
+			return arrTopics;
+		};
+
+		//	Subscribers
+		intPubsIdx = 0;
+		for(; intPubsIdx<intPubsMax; intPubsIdx+=1) {
+			arrSubs = arrPubs[intPubsIdx].querySelectorAll("td");
+			intSubsMax = arrSubs.length;
+			intSubsIdx = 1;
+			objInput = arrPubs[intPubsIdx].querySelector("input");
+
+			for(; intSubsIdx<intSubsMax; intSubsIdx+=1) {
+				PubSubHub.subscribe(arrPubs[intPubsIdx].className+ arrSubs[intSubsIdx].className,
+					deriveTopicArray( arrSubs[intSubsIdx]),
+					genSubscriber("table."+ arrPubs[intPubsIdx].className+ " td."+ arrSubs[intSubsIdx].className));
+			}
+		}
+	})();
+</script>
+</body>
+</html>
