@@ -7,12 +7,13 @@
 <script>
 	"use strict";
 
-	function Alert(pMessage) {
+	var Alert = (function() {
 		var dnode = document.querySelector("#output");
-		var output = pMessage? (dnode.innerHTML + pMessage): "";
-		document.querySelector("#output").innerHTML = output;
-	}
-
+		return function(pMessage) {
+			dnode.innerHTML = (pMessage? (dnode.innerHTML + pMessage): "");
+		};
+	})();
+	
 	function pubSubReport(subId, topic,data){
 		Alert("<h3>Subscriber ["+ subId+ "] Topic '"+ topic+ "' updated to ["+ data+ "]</h3>");
 	}
