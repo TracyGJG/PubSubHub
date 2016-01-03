@@ -28,3 +28,5 @@ Each table consists of an input text field above two table-data (td) elements.
 The input fields represent data producers and the tds represent data consumers, one for each of the other tables.
 The producers are registered as Topic Publishers (Y,C & L) respectively. The consumers register as Topic Subcscribers (YC, YL, CY, CL, LY & LC).
 By typing in the text fields the TD's are populated with the same data, in a simple data binding manner but wil multiple (two) output for each input. It is technically feasible to a register more that 1 data producer as a Publisher a single Topic.
+
+Check out the associated article at my blog site (https://gilmoretj.wordpress.com/personal-projects/javascript-based-pub-sub-hub/).
