@@ -42,50 +42,76 @@ var PubSubHub = (function() {
 			topicIndex,
 			topicLoop;
 
+		if (!pSubId) {
+			throw 'A Subscriber Id is required in order to Subscribe to a Topic.';
+		}
+		if (!pTopics || (pTopics.length ===0)) {
+			throw 'At least one Topic is required in order to Subscribe.';
+		}
+		if (!pCallback || (typeof pCallback !== "function")) {
+			throw 'A Callback function is required in order to Subscribe to a Topic.';
+		}
 		for (topicLoop=pTopics.length; topicLoop;) {
 			topicIndex = pTopics[topicLoop-=1];
-			topic = objTopics[topicIndex];
 
-			if (!topic) {
-				topic = (objTopics[topicIndex] = { data:null, subscribers:{}});
-			}
-			if (!!pCallback) {
+			if (!!topicIndex) {
+				topic = objTopics[topicIndex];
+				if (!topic) {
+					throw 'The named Topic does not exist.';
+				}
 				topic.subscribers[pSubId] = pCallback;
 				if (!!topic.data) {
 					pCallback(pSubId, topicIndex, topic.data);
 				}
 			}
+			else {
+				throw 'A named Topic is required in order to Subscribe.';
+			}
 		}
-	};
+	}
 
 	function PubSubHub_unsubscribe(pSubId, pTopics) {
 		var topic,
 			topicIndex,
 			topicLoop;
 
+		if (!pSubId) {
+			throw 'A Subscriber Id is required in order to Subscribe to a Topic.';
+		}
+		if (!pTopics || (pTopics.length ===0)) {
+			throw 'At least one Topic is required in order to Subscribe.';
+		}
 		for (topicLoop=pTopics.length; topicLoop;) {
 			topicIndex = pTopics[topicLoop-=1];
-			topic = objTopics[topicIndex];
 
-			if (!!objTopics[topicIndex].subscribers[pSubId]) {
-				delete objTopics[topicIndex].subscribers[pSubId];
+			if (!!topicIndex) {
+				topic = objTopics[topicIndex];
+				if (!!objTopics[topicIndex].subscribers[pSubId]) {
+					delete objTopics[topicIndex].subscribers[pSubId];
+				}
+			}
+			else {
+				throw 'A named Topic is required in order to Subscribe.';
 			}
 		}
-	};
+	}
 
 	function PubSubHub_publish(pTopic, pData) {
+		if (!pTopic) {
+			throw 'A Topic is required in order to Publish data.';
+		}
 		var topic = objTopics[pTopic],
-			topicLoop;
+			subLoop;
 		if (!topic) {
 			topic = (objTopics[pTopic] = { data:null, subscribers:{}});
 		}
 		topic.data = pData;
 		if (!!pData) {
-			for (topicLoop in topic.subscribers) {
-				topic.subscribers[topicLoop](topicLoop, pTopic, pData);
+			for (subLoop in topic.subscribers) {
+				topic.subscribers[subLoop](subLoop, pTopic, pData);
 			}
 		}
-	};
+	}
 
 	/* Publish the interface to the API */
 	return {

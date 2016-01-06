@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html><head>
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+	<style>
+		h1 { font-size: 1.5em;}
+		h2 {
+			font-size: 1.0em;
+			color: #00f;
+		}
+		h3 { font-size: 0.8em;}
+	</style>
 	<script src='PubSubHub.js'></script>
 </head><body>
 	<div id='output'></div>
@@ -13,7 +21,7 @@
 			dnode.innerHTML = (pMessage? (dnode.innerHTML + pMessage): "");
 		};
 	})();
-	
+
 	function pubSubReport(subId, topic,data){
 		Alert("<h3>Subscriber ["+ subId+ "] Topic '"+ topic+ "' updated to ["+ data+ "]</h3>");
 	}
@@ -21,46 +29,105 @@
 	(function() {
 		Alert( "<h1>PubSubHub Tests - Phase 1</h1>");
 		/*
-			S1 -> P1
-			S2 -> P2
-			S3 -> P2
-			S4 -> P1 & P2
-											P1: S1 & S4
-											P2: S2, S3 & S4
+			P1 -> T1
+			S1 -> T1
+			P1 -> T1 -> S1
 
-			S4 -X P1 & P2
-			S5 -> P2
-											P1: S1
-											P2: S2, S3 & S5
+			P2 -> T2
+			S2 -> T2
+			S3 -> T2
+			P2 -> T2	-> S2 & S3
+
+			S4 -> T1 & T2 P1 & P2
 		*/
 
-		Alert( "<h2>TestOne: Publish then Subscribe - 1 Callback fired.</h2>");
-		PubSubHub.publish("TestOne", "TEST ONE");																						// No registered callbacks.
+		Alert( "<h2>TestOne: Publish without data then Subscribe - 0 Callback fired.</h2>");
+		PubSubHub.publish("TestOne");																												// No registered callbacks. Create Topic only.
 		PubSubHub.subscribe("Sub1", ["TestOne"], pubSubReport);															// Callback fired.
+		PubSubHub.publish("TestOne", "TEST ONE UPDATE 1");																	// Two callbacks fired for topic 1.
 
-		Alert( "<br/><h2>TestTwo: Subscribe twice then Publish - 2 Callbacks fired.</h2>");
+		Alert( "<h2>TestTwo: Subscribe twice then Publish - 2 Callbacks fired.</h2>");
+		PubSubHub.publish("TestTwo");																												// No registered callbacks. Create Topic only.
 		PubSubHub.subscribe("Sub2", ["TestTwo"], pubSubReport);															// No callback fired - no data.
 		PubSubHub.subscribe("Sub3", ["TestTwo"], pubSubReport);															// No callback fired - no data.
-		PubSubHub.publish("TestTwo", "TEST TWO");																						// Two callbacks fired for topic 2.
+		PubSubHub.publish("TestTwo", "TEST TWO UPDATED");																		// Three callbacks fired for topic 2.
 
-		Alert( "<br/><h2>TestOne &amp; Two: Subscribe to two - pre-existing Topics, both callbacks fired.</h2>");
+		Alert( "<h2>TestOne &amp; Two: Subscribe to two - pre-existing Topics, both callbacks fired.</h2>");
 		PubSubHub.subscribe("Sub4", ["TestTwo","TestOne"], pubSubReport);										// Two callbacks fired for topic 2.
 
-		Alert( "<br/><h1>PubSubHub Tests - Phase 2</h1>");
+		/*
+			P1	->	T1	->	S1 & S4
 
+			S4	x		T1
+			P1	->	T1	->	S1
+
+			P2	->	T2	(empty)
+			S5	->	T2	(empty)
+
+			P2	->	T2	->	S2, S3 & S5
+		*/
+		Alert( "<br/><h1>PubSubHub Tests - Phase 2</h1>");
 		Alert( "<h2>TestOne - Update1: Topic updated, 2 Callbacks fired.</h2>");
 		PubSubHub.publish("TestOne", "TEST ONE UPDATE 1");																	// Two callbacks fired for topic 1.
 
-		Alert( "<br/><h2>TestOne - Update2: Topic updated, 1 Callback fired.</h2>");
+		Alert( "<h2>TestOne - Update2: Topic updated, 1 Callback fired.</h2>");
 		PubSubHub.unsubscribe("Sub4", ["TestTwo","TestOne"]);																// Unsubscribe - no callbacks fired.
 		PubSubHub.publish("TestOne", "TEST ONE UPDATE 2");																	// One callback fired for topic 1.
 
-		Alert( "<br/><h2>TestTwo - Clear: Topic cleared - no callbacks fired.</h2>");
-		PubSubHub.publish("TestTwo");																											// Data cleared - no callbacks fired.
+		Alert( "<h2>TestTwo - Clear: Topic cleared - no callbacks fired.</h2>");
+		PubSubHub.publish("TestTwo");																												// Data cleared - no callbacks fired.
 		PubSubHub.subscribe("Sub5", ["TestTwo"], pubSubReport);															// No callback fired for topic 2.
 
-		Alert( "<br/><h2>TestTwo - Updated: Topic updated, 3 Callbacks fired.</h2>");
+		Alert( "<h2>TestTwo - Updated: Topic updated, 3 Callbacks fired.</h2>");
 		PubSubHub.publish("TestTwo", "TEST TWO UPDATED");																	// Three callbacks fired for topic 2.
+
+
+		//	Exception Handling
+		Alert( "<br/><h1>Exceptions</h1>");
+		Alert( "<h2>Subscriptions</h2>");
+		testSubscribe("", ["Test_"], pubSubReport);
+		testSubscribe("Sub_", [], pubSubReport);
+		testSubscribe("Sub_", ["Test__"], pubSubReport);
+		testSubscribe("Sub_", ["Test_",""], pubSubReport);
+		testSubscribe("Sub_", ["Test_"]);
+		testSubscribe("Sub_", ["Test_"], "Not a callback");
+
+		function testSubscribe(pSubId, pTopics, pCallback) {
+			try {
+				PubSubHub.subscribe(pSubId, pTopics, pCallback);
+			}
+			catch(err) {
+				Alert( "<h3>"+ err+ "</h3>");
+			}
+		}
+
+		Alert( "<h2>Publications</h2>");
+		PubSubHub.subscribe("Sub6", ["TestTwo"], pubSubReport);
+		testPublish("", "Exception");
+		testPublish(null, "Exception");
+
+		function testPublish(pTopic, pData) {
+			try {
+				PubSubHub.publish(pTopic, pData);
+			}
+			catch(err) {
+				Alert( "<h3>"+ err+ "</h3>");
+			}
+		}
+
+		Alert( "<h2>Unsubscriptions</h2>");
+		testUnsubscribe("", ["TestTwo"]);
+		testUnsubscribe("Sub_", []);
+		testUnsubscribe("Sub_", ["Test_", ""]);
+
+		function testUnsubscribe(pSubId, pTopics) {
+			try {
+				PubSubHub.unsubscribe(pSubId, pTopics);
+			}
+			catch(err) {
+				Alert( "<h3>"+ err+ "</h3>");
+			}
+		}
 	})();
 </script>
 </body>

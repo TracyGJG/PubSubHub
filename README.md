@@ -6,22 +6,17 @@ The two html files are samplers for the PubSubHub object.
 PubSubHub.html: Exercises PubSubHub through a series of calls that play-out the following scenario.
 
 Phase 1
-
-TestOne: Publish data and Subscribe (Sub1) to Topic (TestOne) - Report data to display.
-
-TestTwo: Subscribe (Sub2 and Sub3) and Publish data to both using Topic (TestTwo) - Report data twice.
-
-TestOne/Two: Subscript (Sub4) to both Topics (TestOne and TestTwo) - Report of data from both Topics.
+1a) Publisher creates Topic, Subscribe (Sub1) to Topic (TestOne), and Publisher submits data that gets dispatched to Sub1.
+1b) Publisher creates Topic, Subscribes (Sub2 and Sub3) to Topic, and Publisher submits data to Topic (TestTwo) that is dispatched to Sub2 & Sub3.
+1c) Subscript (Sub4) registers with both Topics (TestOne and TestTwo), Data from both Topics are disptached to it.
 
 Phase 2
+2a) Publish more data to Topic (TestOne) - Data reported to Sub1 and Sub4.
+2b) Unsubscribe (Sub4) from Topic (TestTwo). Publish more data to Topic (TestOne) - Reported to just Sub1.
+2c) Publish nothing to Topic (TestTwo), Subscribe (Sub5) to Topic (TestTwo) - Nothing reported.
+2d) Publish data to Topic (TestTwo) - Three reports issued (S2, S3 and S5).
 
-TestOne Update 1: Publish more data to Topic (TestOne) - Data reported twice.
-
-TestOne Update 2: Unsubscribe (Sub4) from Topic (TestTwo). Publish more data to Topic (TestOne) - Reported to just Sub1.
-
-TestTwo Clear: Publish nothing to Topic (TestTwo), Subscribe (Sub5) to Topic (TestTwo) - Nothing reported.
-
-TestTwo Update: Publish data to Topic (TestTwo) - Three reports issued.
+Exception Testing
 
 PubSubHubUI.html: Presents the user with three tables with Yellow, Cyan and Lime backgrounds.
 Each table consists of an input text field above two table-data (td) elements.
