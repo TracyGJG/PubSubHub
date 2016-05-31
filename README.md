@@ -1,5 +1,6 @@
 # PubSubHub 
 This project is not production code. It has been developed as a demonstrator.
+
 The PubSubHub.js file adopts a pure (agent-generic) code that enables it to be used in Isomorphic JavaScript mode. This enables the object to be executes within a modern web browser, on JavaScript engines such as NodeJs and Rhino, and online IDEs such as Cloud9 or CodePen (http://codepen.io/TracyGJG/pen/zvroxx).
 
 The two html files are samplers for the PubSubHub object.
