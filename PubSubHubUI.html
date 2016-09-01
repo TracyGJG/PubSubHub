@@ -58,12 +58,13 @@
 		var intPubsIdx = 0;
 		var objInput;
 		var arrSubs, intSubsMax, intSubsIdx;
+		var fnKeyup= function(){
+			PubSubHub.publish(this.id, this.value);
+		};
 
 		for(; intPubsIdx<intPubsMax; intPubsIdx+=1) {
 			objInput = arrPubs[intPubsIdx].querySelector("input");
-			objInput.addEventListener("keyup", function(){
-				PubSubHub.publish(this.id, this.value);
-			});
+			objInput.addEventListener("keyup", fnKeyup);
 		}
 
 		//	Generate the Subscription handler function
@@ -79,7 +80,7 @@
 			var arrTopics = [objInput.id];
 			arrTopics.push();
 			return arrTopics;
-		};
+		}
 
 		//	Subscribers
 		intPubsIdx = 0;

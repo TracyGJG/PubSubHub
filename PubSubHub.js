@@ -1,5 +1,3 @@
-"use strict";
-
 /*================================================
 	PubSubHub: Publish and Subscribe exchange.
 
@@ -35,12 +33,12 @@ publish(TOPIC, DATA)
 ================================================*/
 
 var PubSubHub = (function() {
+	"use strict";
+
 	var objTopics= {};
 
 	function PubSubHub_subscribe(pSubId, pTopics, pCallback) {
-		var topic,
-			topicIndex,
-			topicLoop;
+		var topic, topicIndex, topicLoop;
 
 		if (!pSubId) {
 			throw 'A Subscriber Id is required in order to Subscribe to a Topic.';
@@ -57,11 +55,13 @@ var PubSubHub = (function() {
 			if (!!topicIndex) {
 				topic = objTopics[topicIndex];
 				if (!topic) {
-					throw 'The named Topic does not exist.';
+					topic = (objTopics[topicIndex] = { data:null, subscribers:{}});
 				}
-				topic.subscribers[pSubId] = pCallback;
-				if (!!topic.data) {
-					pCallback(pSubId, topicIndex, topic.data);
+				if (!!pCallback) {
+					topic.subscribers[pSubId] = pCallback;
+					if (!!topic.data) {
+						pCallback(pSubId, topicIndex, topic.data);
+					}
 				}
 			}
 			else {
@@ -71,9 +71,7 @@ var PubSubHub = (function() {
 	}
 
 	function PubSubHub_unsubscribe(pSubId, pTopics) {
-		var topic,
-			topicIndex,
-			topicLoop;
+		var topic, topicIndex, topicLoop;
 
 		if (!pSubId) {
 			throw 'A Subscriber Id is required in order to Subscribe to a Topic.';
@@ -100,15 +98,14 @@ var PubSubHub = (function() {
 		if (!pTopic) {
 			throw 'A Topic is required in order to Publish data.';
 		}
-		var topic = objTopics[pTopic],
-			subLoop;
+		var topic = objTopics[pTopic], topicLoop;
 		if (!topic) {
 			topic = (objTopics[pTopic] = { data:null, subscribers:{}});
 		}
 		topic.data = pData;
 		if (!!pData) {
-			for (subLoop in topic.subscribers) {
-				topic.subscribers[subLoop](subLoop, pTopic, pData);
+			for (topicLoop in topic.subscribers) {
+				topic.subscribers[topicLoop](topicLoop, pTopic, pData);
 			}
 		}
 	}
