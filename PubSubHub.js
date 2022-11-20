@@ -32,30 +32,33 @@ publish(TOPIC, DATA)
 
 ================================================*/
 
-var PubSubHub = (function() {
-	"use strict";
+const PubSubHub = (function () {
+	'use strict';
 
-	var objTopics= {};
+	const objTopics = {};
 
 	function PubSubHub_subscribe(pSubId, pTopics, pCallback) {
-		var topic, topicIndex, topicLoop;
+		let topic, topicIndex, topicLoop;
 
 		if (!pSubId) {
 			throw 'A Subscriber Id is required in order to Subscribe to a Topic.';
 		}
-		if (!pTopics || (pTopics.length ===0)) {
+		if (!pTopics || !pTopics.length) {
 			throw 'At least one Topic is required in order to Subscribe.';
 		}
-		if (!pCallback || (typeof pCallback !== "function")) {
+		if (!pCallback || typeof pCallback !== 'function') {
 			throw 'A Callback function is required in order to Subscribe to a Topic.';
 		}
-		for (topicLoop=pTopics.length; topicLoop;) {
-			topicIndex = pTopics[topicLoop-=1];
+		for (topicLoop = pTopics.length; topicLoop; ) {
+			topicIndex = pTopics[(topicLoop -= 1)];
 
 			if (!!topicIndex) {
 				topic = objTopics[topicIndex];
 				if (!topic) {
-					topic = (objTopics[topicIndex] = { data:null, subscribers:{}});
+					topic = objTopics[topicIndex] = {
+						data: null,
+						subscribers: {},
+					};
 				}
 				if (!!pCallback) {
 					topic.subscribers[pSubId] = pCallback;
@@ -63,32 +66,30 @@ var PubSubHub = (function() {
 						pCallback(pSubId, topicIndex, topic.data);
 					}
 				}
-			}
-			else {
+			} else {
 				throw 'A named Topic is required in order to Subscribe.';
 			}
 		}
 	}
 
 	function PubSubHub_unsubscribe(pSubId, pTopics) {
-		var topic, topicIndex, topicLoop;
+		let topic, topicIndex, topicLoop;
 
 		if (!pSubId) {
 			throw 'A Subscriber Id is required in order to Subscribe to a Topic.';
 		}
-		if (!pTopics || (pTopics.length ===0)) {
+		if (!pTopics || !pTopics.length) {
 			throw 'At least one Topic is required in order to Subscribe.';
 		}
-		for (topicLoop=pTopics.length; topicLoop;) {
-			topicIndex = pTopics[topicLoop-=1];
+		for (topicLoop = pTopics.length; topicLoop; ) {
+			topicIndex = pTopics[(topicLoop -= 1)];
 
 			if (!!topicIndex) {
 				topic = objTopics[topicIndex];
 				if (!!objTopics[topicIndex].subscribers[pSubId]) {
 					delete objTopics[topicIndex].subscribers[pSubId];
 				}
-			}
-			else {
+			} else {
 				throw 'A named Topic is required in order to Subscribe.';
 			}
 		}
@@ -98,9 +99,10 @@ var PubSubHub = (function() {
 		if (!pTopic) {
 			throw 'A Topic is required in order to Publish data.';
 		}
-		var topic = objTopics[pTopic], topicLoop;
+		let topic = objTopics[pTopic],
+			topicLoop;
 		if (!topic) {
-			topic = (objTopics[pTopic] = { data:null, subscribers:{}});
+			topic = objTopics[pTopic] = { data: null, subscribers: {} };
 		}
 		topic.data = pData;
 		if (!!pData) {
@@ -112,7 +114,8 @@ var PubSubHub = (function() {
 
 	/* Publish the interface to the API */
 	return {
-		subscribe:PubSubHub_subscribe,
-		unsubscribe:PubSubHub_unsubscribe,
-		publish:PubSubHub_publish};
+		subscribe: PubSubHub_subscribe,
+		unsubscribe: PubSubHub_unsubscribe,
+		publish: PubSubHub_publish,
+	};
 })();
