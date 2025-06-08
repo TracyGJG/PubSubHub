@@ -1,102 +1,112 @@
 <!DOCTYPE html>
-<html><head>
-	<title>Pub-Sub-Hub UI</title>
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
-	<style>
-		table.Y {
-			background-color: yellow;
-		}
-		table.C {
-			background-color: cyan;
-		}
-		table.L {
-			background-color: lime;
-		}
-	</style>
-	<script src='PubSubHub.js'></script>
-</head><body>
+<html>
+  <head>
+    <title>Pub-Sub-Hub UI</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <style>
+      table.Y {
+        background-color: yellow;
+      }
+      table.C {
+        background-color: cyan;
+      }
+      table.L {
+        background-color: lime;
+      }
+    </style>
+    <script src="PubSubHub.js"></script>
+  </head>
+  <body>
+    <table class="Y">
+      <tr>
+        <td colspan="2"><input type="text" id="Yellow" value="Yellow" /></td>
+      </tr>
+      <tr>
+        <td class="C">&nbsp;</td>
+        <td class="L">&nbsp;</td>
+      </tr>
+    </table>
+    <br /><br />
 
-	<table class='Y'>
-		<tr>
-			<td colspan='2'><input type='text' id='Yellow' value='Yellow'/></td>
-		</tr>
-		<tr>
-			<td class='C'>&nbsp;</td>
-			<td class='L'>&nbsp;</td>
-		</tr>
-	</table>
-	<br/><br/>
+    <table class="C">
+      <tr>
+        <td colspan="2"><input type="text" id="Cyan" value="Cyan" /></td>
+      </tr>
+      <tr>
+        <td class="Y">&nbsp;</td>
+        <td class="L">&nbsp;</td>
+      </tr>
+    </table>
+    <br /><br />
 
-	<table class='C'>
-		<tr>
-			<td colspan='2'><input type='text' id='Cyan' value='Cyan'/></td>
-		</tr>
-		<tr>
-			<td class='Y'>&nbsp;</td>
-			<td class='L'>&nbsp;</td>
-		</tr>
-	</table>
-	<br/><br/>
+    <table class="L">
+      <tr>
+        <td colspan="2"><input type="text" id="Lime" value="Lime" /></td>
+      </tr>
+      <tr>
+        <td class="Y">&nbsp;</td>
+        <td class="C">&nbsp;</td>
+      </tr>
+    </table>
 
-	<table class='L'>
-		<tr>
-			<td colspan='2'><input type='text' id='Lime' value='Lime'/></td>
-		</tr>
-		<tr>
-			<td class='Y'>&nbsp;</td>
-			<td class='C'>&nbsp;</td>
-		</tr>
-	</table>
+    <script>
+      'use strict';
 
-<script>
-	"use strict";
+      (function () {
+        //	Publishers
+        var arrPubs = document.querySelectorAll('table');
+        var intPubsMax = arrPubs.length;
+        var intPubsIdx = 0;
+        var objInput;
+        var arrSubs, intSubsMax, intSubsIdx;
+        var fnKeyup = function () {
+          PubSubHub.publish(this.id, this.value);
+        };
 
-	(function() {
-		//	Publishers
-		var arrPubs = document.querySelectorAll("table");
-		var intPubsMax = arrPubs.length;
-		var intPubsIdx = 0;
-		var objInput;
-		var arrSubs, intSubsMax, intSubsIdx;
-		var fnKeyup= function(){
-			PubSubHub.publish(this.id, this.value);
-		};
+        for (; intPubsIdx < intPubsMax; intPubsIdx += 1) {
+          objInput = arrPubs[intPubsIdx].querySelector('input');
+          objInput.addEventListener('keyup', fnKeyup);
+        }
 
-		for(; intPubsIdx<intPubsMax; intPubsIdx+=1) {
-			objInput = arrPubs[intPubsIdx].querySelector("input");
-			objInput.addEventListener("keyup", fnKeyup);
-		}
+        //	Generate the Subscription handler function
+        function genSubscriber(dom) {
+          return function (subId, topic, data) {
+            document.querySelector(dom).innerText = data;
+          };
+        }
 
-		//	Generate the Subscription handler function
-		function genSubscriber( dom) {
-			return function(subId, topic, data) {
-				document.querySelector(dom).innerText = data;
-			};
-		}
+        // Derive the Topics Array from the table DOM reference.
+        function deriveTopicArray(dom) {
+          var objInput = document.querySelector(
+            'table.' + dom.className + ' input'
+          );
+          var arrTopics = [objInput.id];
+          arrTopics.push();
+          return arrTopics;
+        }
 
-		// Derive the Topics Array from the table DOM reference.
-		function deriveTopicArray( dom) {
-			var objInput = document.querySelector("table."+ dom.className+ " input");
-			var arrTopics = [objInput.id];
-			arrTopics.push();
-			return arrTopics;
-		}
+        //	Subscribers
+        intPubsIdx = 0;
+        for (; intPubsIdx < intPubsMax; intPubsIdx += 1) {
+          arrSubs = arrPubs[intPubsIdx].querySelectorAll('td');
+          intSubsMax = arrSubs.length;
+          intSubsIdx = 1;
+          objInput = arrPubs[intPubsIdx].querySelector('input');
 
-		//	Subscribers
-		intPubsIdx = 0;
-		for(; intPubsIdx<intPubsMax; intPubsIdx+=1) {
-			arrSubs = arrPubs[intPubsIdx].querySelectorAll("td");
-			intSubsMax = arrSubs.length;
-			intSubsIdx = 1;
-			objInput = arrPubs[intPubsIdx].querySelector("input");
-
-			for(; intSubsIdx<intSubsMax; intSubsIdx+=1) {
-				PubSubHub.subscribe(arrPubs[intPubsIdx].className+ arrSubs[intSubsIdx].className,
-					deriveTopicArray( arrSubs[intSubsIdx]),
-					genSubscriber("table."+ arrPubs[intPubsIdx].className+ " td."+ arrSubs[intSubsIdx].className));
-			}
-		}
-	})();
-</script>
-</body>
+          for (; intSubsIdx < intSubsMax; intSubsIdx += 1) {
+            PubSubHub.subscribe(
+              arrPubs[intPubsIdx].className + arrSubs[intSubsIdx].className,
+              deriveTopicArray(arrSubs[intSubsIdx]),
+              genSubscriber(
+                'table.' +
+                  arrPubs[intPubsIdx].className +
+                  ' td.' +
+                  arrSubs[intSubsIdx].className
+              )
+            );
+          }
+        }
+      })();
+    </script>
+  </body>
 </html>
